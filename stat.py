@@ -60,6 +60,25 @@ if __name__ == "__main__":
     for row in results:
         print('{0} {1}'.format(row[0], row[2]))
 
+    print("")
+    print("======== Год ============")
+
+    cursor.execute("""
+        select 
+          strftime('%Y', round(id/1000), 'unixepoch') date, 
+          sum(time)/1000/60 spend_tine,
+          sum(time)/1000/60/25 tomato
+        from revlog 
+        where (id/1000)>=CAST(strftime('%s', 'now', 'start of day', '-425 days') as decimal) 
+        group by strftime('%Y', round(id/1000), 'unixepoch')
+        order by id desc
+    """)
+
+    # Получаем результат сделанного запроса
+    results = cursor.fetchall()
+    for row in results:
+        print('{0} {1}'.format(row[0], row[2]))
+
     conn.rollback()
     # Не забываем закрыть соединение с базой данных
     conn.close()
